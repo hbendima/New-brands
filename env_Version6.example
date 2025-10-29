@@ -1,0 +1,10 @@
+# MySQL/PrestaShop database (lokaal of via tunnel). Gebruik een read-only user.
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=prestashop
+DB_USER=report_ro
+DB_PASS=change_me
+
+# Defaults voor script (kun je ook via CLI meegeven)
+SHOP_ID=4
+MIN_PRODUCTS=0
