@@ -2,7 +2,7 @@
 import os, json, csv, argparse, datetime as dt, pathlib, re
 import mysql.connector
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+ROOT = pathlib.Path(__file__).resolve().parent
 
 def load_env():
     # Eenvoudige .env loader (geen extra dependency)
@@ -120,10 +120,10 @@ def main():
 
     items, total_products = [], 0
     for r in rows:
-        first_ts = r["first_live_product_at"]
+        first_ts = r["eerste_product_launch"]
         iso = first_ts.isoformat(sep=" ") if hasattr(first_ts, "isoformat") else str(first_ts)
-        count = int(r["product_count"] or 0)
-        items.append({"merk": r["merknaam"], "eerste_product_live": iso, "aantal_producten": count})
+        count = int(r["aantal_producten"] or 0)
+        items.append({"merk": r["merk"], "eerste_product_live": iso, "aantal_producten": count})
         total_products += count
 
     payload = {
