@@ -7,20 +7,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simpledotcss/simple.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.min.css">
   <script src="https://cdn.datatables.net/2.1.7/js/dataTables.min.js"></script>
   <style>
-    main { max-width: 1100px; margin: 0 auto; }
-    .meta { font-size: .95rem; color: #555; }
-    .actions { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
-    .pill { padding: .25rem .5rem; border: 1px solid #ddd; border-radius: 999px; }
-    table { width: 100%; }
-    footer { margin-top: 2rem; font-size: .9rem; color: #666; }
+    main { max-width: 1100px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px #0001; padding: 2rem; }
+    h1 { font-size: 2.2rem; margin-bottom: .5rem; }
+    .meta { font-size: 1rem; color: #555; margin-bottom: 1.5rem; }
+    .actions { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom: 1.5rem; }
+    .pill { padding: .35rem .7rem; border: 1px solid #ddd; border-radius: 999px; background: #f6f6f6; font-size: 1rem; }
+    .button.outline { background: #0078d4; color: #fff; border-radius: 6px; padding: .4rem 1rem; text-decoration: none; font-weight: 500; }
+    .button.outline:hover { background: #005fa3; }
+    table.dataTable { border-radius: 8px; overflow: hidden; box-shadow: 0 1px 8px #0001; }
+    th, td { text-align: left; padding: .7rem .5rem; }
+    th { background: #f0f4f8; font-size: 1.05rem; }
+    tr:nth-child(even) { background: #fafbfc; }
+    tr:hover { background: #e6f7ff; }
+    #totals { margin-top:1rem; font-weight:600; font-size:1.1rem; }
+    footer { margin-top: 2rem; font-size: .95rem; color: #666; text-align:center; }
   </style>
 </head>
 <body>
 <main>
-  <h1>Nieuwe merken (SEO/SEA)</h1>
+  <h1><i class="fas fa-star"></i> Nieuwe merken overzicht</h1>
   <p class="meta">
     Dit overzicht toont merken waarvan het eerste live/zichtbare product in de periode is gepubliceerd
     (shop NL, id 4). Data is statisch en wordt ververst wanneer je de build draait en pusht.
@@ -34,46 +43,45 @@
   </div>
 
   <section>
-    <table id="tbl" class="display"></table>
-    <div id="totals" style="margin-top:.75rem;font-weight:600;"></div>
+    <table id="tbl" class="display" style="width:100%"></table>
+    <div id="totals"></div>
   </section>
 
   <footer>
-    <div>Gegenereerd op <span id="gen"></span></div>
-    <div>Bron: PrestaShop ps_product / ps_product_shop / ps_manufacturer (alleen actieve/zichtbare producten).</div>
+    <div><i class="fas fa-clock"></i> Gegenereerd op <span id="gen"></span></div>
+    <div><i class="fas fa-database"></i> Bron: PrestaShop ps_product / ps_product_shop / ps_manufacturer (alleen actieve/zichtbare producten).</div>
+    <div style="margin-top:.5rem;">&copy; 2025 Klium | Powered by GitHub Pages</div>
   </footer>
 </main>
 
 <script>
-(async function() {
-  const res = await fetch('./data.json', { cache: 'no-cache' });
-  if (!res.ok) {
-    document.body.innerHTML = '<p>Kon data.json niet laden.</p>';
-    return;
-  }
-  const payload = await res.json();
-  const items = payload.items || [];
+fetch('./data.json', { cache: 'no-cache' })
+  .then(res => res.json())
+  .then(payload => {
+    const items = payload.items || [];
+    document.getElementById('range').textContent = `${payload.meta.start_date} → ${payload.meta.end_date} (excl)`;
+    document.getElementById('shop').textContent  = payload.meta.shop_id;
+    document.getElementById('minp').textContent  = payload.meta.min_products;
+    document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
+    document.getElementById('totals').textContent =
+      `Totaal producten bij nieuwe merken: ${payload.meta.sum_producten} | Aantal merken: ${payload.meta.rows}`;
 
-  document.getElementById('range').textContent = `${payload.meta.start_date} → ${payload.meta.end_date} (excl)`;
-  document.getElementById('shop').textContent  = payload.meta.shop_id;
-  document.getElementById('minp').textContent  = payload.meta.min_products;
-  document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
-  document.getElementById('totals').textContent =
-    `Totaal producten bij nieuwe merken: ${payload.meta.sum_producten} | Aantal merken: ${payload.meta.rows}`;
-
-  const data = items.map(r => [r.merk, r.eerste_product_live, r.aantal_producten]);
-  new DataTable('#tbl', {
-    data,
-    columns: [
-      { title: 'Merk' },
-      { title: 'Eerste product live' },
-      { title: 'Aantal producten' }
-    ],
-    pageLength: 25,
-    order: [[1, 'desc']],
-    layout: { topStart: null, topEnd: null, bottomStart: 'search', bottomEnd: 'paging' }
+    const data = items.map(r => [r.merk, r.eerste_product_live, r.aantal_producten]);
+    new DataTable('#tbl', {
+      data,
+      columns: [
+        { title: 'Merk' },
+        { title: 'Eerste product live' },
+        { title: 'Aantal producten' }
+      ],
+      pageLength: 25,
+      order: [[1, 'desc']],
+      layout: { topStart: null, topEnd: null, bottomStart: 'search', bottomEnd: 'paging' }
+    });
+  })
+  .catch(() => {
+    document.getElementById('tbl').outerHTML = '<p style="color:red">Kon data.json niet laden.</p>';
   });
-})();
 </script>
 </body>
 </html>
