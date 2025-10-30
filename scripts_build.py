@@ -42,46 +42,50 @@ def connect():
     return mysql.connector.connect(**cfg)
 
 def fetch_new_brands(conn, shop_id, start_date, end_date, min_products):
-    # MySQL 5.7+ compatible (geen CTE). Alleen actieve/zichtbare producten in gekozen shop.
-    sql = """
-    SELECT
-      pm.id_manufacturer,
-      pm.name AS merknaam,
-      lp.first_live_product_at,
-      (
-        SELECT COUNT(DISTINCT p2.id_product)
-        FROM ps_product p2
-        JOIN ps_product_shop s2
-          ON s2.id_product = p2.id_product
-         AND s2.id_shop = %s
-         AND s2.active = 1
-         AND s2.visibility <> 'none'
-        WHERE p2.id_manufacturer = pm.id_manufacturer
-      ) AS product_count
-    FROM (
-      SELECT
-        p.id_manufacturer,
-        MIN(p.date_add) AS first_live_product_at
-      FROM ps_product p
-      JOIN ps_product_shop s
-        ON s.id_product = p.id_product
-       AND s.id_shop = %s
-       AND s.active = 1
-       AND s.visibility <> 'none'
-      GROUP BY p.id_manufacturer
-    ) lp
-    JOIN ps_manufacturer pm ON pm.id_manufacturer = lp.id_manufacturer
-    WHERE lp.first_live_product_at >= %s
-      AND lp.first_live_product_at <  %s
-    HAVING product_count >= %s
-    ORDER BY lp.first_live_product_at DESC
-    """
-    params = (shop_id, shop_id, start_date, end_date, min_products)
-    cur = conn.cursor(dictionary=True)
-    cur.execute(sql, params)
-    rows = cur.fetchall()
-    cur.close()
-    return rows
+        # Nieuwe merken en hun producten in de opgegeven periode, zonder verkoopdata
+        sql = """
+        WITH eerste_product_per_merk AS (
+                SELECT
+                        pp.id_manufacturer,
+                        MIN(pp.date_add) AS eerste_product_launch
+                FROM
+                        ps_product pp
+                GROUP BY pp.id_manufacturer
+        )
+        , nieuwe_merken AS (
+                SELECT
+                        pm.id_manufacturer,
+                        pm.name AS merk,
+                        epm.eerste_product_launch
+                FROM
+                        eerste_product_per_merk epm
+                JOIN ps_manufacturer pm ON pm.id_manufacturer = epm.id_manufacturer
+                WHERE epm.eerste_product_launch >= %s AND epm.eerste_product_launch < %s
+        )
+        , producten_nieuwe_merken AS (
+                SELECT
+                        pp.id_product,
+                        pp.id_manufacturer
+                FROM
+                        ps_product pp
+                WHERE pp.id_manufacturer IN (SELECT id_manufacturer FROM nieuwe_merken)
+        )
+        SELECT
+                nm.merk,
+                nm.eerste_product_launch,
+                COUNT(DISTINCT pnm.id_product) AS aantal_producten
+        FROM nieuwe_merken nm
+        JOIN producten_nieuwe_merken pnm ON nm.id_manufacturer = pnm.id_manufacturer
+        GROUP BY nm.id_manufacturer, nm.merk, nm.eerste_product_launch
+        HAVING aantal_producten >= %s
+        ORDER BY nm.eerste_product_launch DESC
+        """
+        params = (start_date, end_date, min_products)
+        cur = conn.cursor(dictionary=True)
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+        cur.close()
+        return rows
 
 def write_json(path, payload):
     with open(path, "w", encoding="utf-8") as f:
