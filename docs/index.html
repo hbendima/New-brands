@@ -14,14 +14,17 @@
     h1 { font-size: 2.2rem; margin-bottom: .5rem; }
     .meta { font-size: 1rem; color: #555; margin-bottom: 1.5rem; }
     .actions { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom: 1.5rem; }
-    .pill { padding: .35rem .7rem; border: 1px solid #ddd; border-radius: 999px; background: #f6f6f6; font-size: 1rem; }
     .button.outline { background: #0078d4; color: #fff; border-radius: 6px; padding: .4rem 1rem; text-decoration: none; font-weight: 500; }
     .button.outline:hover { background: #005fa3; }
-    table.dataTable { border-radius: 8px; overflow: hidden; box-shadow: 0 1px 8px #0001; }
-    th, td { text-align: left; padding: .7rem .5rem; }
-    th { background: #f0f4f8; font-size: 1.05rem; }
-    tr:nth-child(even) { background: #fafbfc; }
-    tr:hover { background: #e6f7ff; }
+    table.dataTable { border-radius: 8px; overflow: hidden; box-shadow: 0 1px 8px #0001; font-size: 1.15rem; }
+    th, td { text-align: left; padding: 1rem .75rem; }
+    th { background: #e0e7ef; font-size: 1.15rem; color: #222; }
+    td { color: #222; background: #fff; }
+    tr:nth-child(even) td { background: #f6f8fa; }
+    tr:hover td { background: #dbeafe; }
+    th:nth-child(1), td:nth-child(1) { min-width: 160px; }
+    th:nth-child(2), td:nth-child(2) { min-width: 180px; }
+    th:nth-child(3), td:nth-child(3) { min-width: 120px; text-align: right; }
     #totals { margin-top:1rem; font-weight:600; font-size:1.1rem; }
     footer { margin-top: 2rem; font-size: .95rem; color: #666; text-align:center; }
   </style>
@@ -35,9 +38,6 @@
   </p>
 
   <div class="actions">
-    <span class="pill">Periode: <strong id="range"></strong></span>
-    <span class="pill">Shop ID: <strong id="shop"></strong></span>
-    <span class="pill">Min. producten: <strong id="minp"></strong></span>
     <a id="csv" class="button outline" href="./data.csv" download>Download CSV</a>
   </div>
 
@@ -58,25 +58,29 @@ fetch('./data.json', { cache: 'no-cache' })
   .then(res => res.json())
   .then(payload => {
     const items = payload.items || [];
-    document.getElementById('range').textContent = `${payload.meta.start_date} → ${payload.meta.end_date} (excl)`;
-    document.getElementById('shop').textContent  = payload.meta.shop_id;
-    document.getElementById('minp').textContent  = payload.meta.min_products;
     document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
     document.getElementById('totals').textContent =
       `Totaal producten bij nieuwe merken: ${payload.meta.sum_producten} | Aantal merken: ${payload.meta.rows}`;
 
-    const data = items.map(r => [r.merk, r.eerste_product_live, r.aantal_producten]);
-    new DataTable('#tbl', {
-      data,
-      columns: [
-        { title: 'Merk' },
-        { title: 'Eerste product live' },
-        { title: 'Aantal producten' }
-      ],
-      pageLength: 25,
-      order: [[1, 'desc']],
-      layout: { topStart: null, topEnd: null, bottomStart: 'search', bottomEnd: 'paging' }
-    });
+    // Bouw een fallback HTML-tabel als DataTable niet werkt
+    const tbl = document.getElementById('tbl');
+    let html = '<thead><tr><th>Merk</th><th>Eerste product live</th><th>Aantal producten</th></tr></thead><tbody>';
+    for (const r of items) {
+      html += `<tr><td>${r.merk}</td><td>${r.eerste_product_live}</td><td>${r.aantal_producten}</td></tr>`;
+    }
+    html += '</tbody>';
+    tbl.innerHTML = html;
+
+    // Probeer DataTable te initialiseren
+    try {
+      new DataTable('#tbl', {
+        pageLength: 25,
+        order: [[1, 'desc']],
+        layout: { topStart: null, topEnd: null, bottomStart: 'search', bottomEnd: 'paging' }
+      });
+    } catch (e) {
+      // Fallback: gewone tabel blijft staan
+    }
   })
   .catch(() => {
     document.getElementById('tbl').outerHTML = '<p style="color:red">Kon data.json niet laden.</p>';
