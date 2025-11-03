@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New Brands (SEO/SEA)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simpledotcss/simple.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/2.1.7/css/dataTables.dataTables.min.css">
+  <script src="https://cdn.datatables.net/2.1.7/js/dataTables.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&display=swap');
+    main { max-width: 1100px; margin: 2rem auto; background: linear-gradient(135deg, #e0e7ef 0%, #fff 100%); border-radius: 16px; box-shadow: 0 4px 32px #0002; padding: 2.5rem; }
+    h1 { font-size: 2.5rem; margin-bottom: .5rem; font-weight: 700; letter-spacing: .02em; color: #2B2E42; text-shadow: 0 2px 8px #0001; font-family:'Open Sans',Arial,sans-serif; }
+    .meta { font-size: 1.08rem; color: #444; margin-bottom: 2rem; font-family:'Open Sans',Arial,sans-serif; }
+    .actions { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; margin-bottom: 2rem; }
+    .button.outline { background: linear-gradient(90deg, #DF1C51 60%, #2B2E42 100%); color: #fff; border-radius: 8px; padding: .5rem 1.2rem; text-decoration: none; font-weight: 600; box-shadow: 0 2px 8px #DF1C5122; border: none; transition: background .2s; font-family:'Open Sans',Arial,sans-serif; }
+    .button.outline:hover { background: linear-gradient(90deg, #2B2E42 60%, #DF1C51 100%); }
+    table.dataTable { border-radius: 10px; overflow: hidden; box-shadow: 0 2px 16px #2B2E4222; font-size: 1.18rem; font-family:'Open Sans',Arial,sans-serif; }
+    th, td { text-align: left; padding: 1.1rem .85rem; }
+    th { background: #e0e7ef; font-size: 1.18rem; color: #2B2E42; letter-spacing: .01em; }
+    td { color: #2B2E42; background: #fff; }
+    tr:nth-child(even) td { background: #f6f8fa; }
+    tr:hover td { background: #FBB13C; }
+    th:nth-child(1), td:nth-child(1) { min-width: 170px; }
+    th:nth-child(2), td:nth-child(2) { min-width: 190px; }
+    th:nth-child(3), td:nth-child(3) { min-width: 130px; text-align: right; }
+    #totals { margin-top:1.2rem; font-weight:600; font-size:1.15rem; color:#DF1C51; font-family:'Open Sans',Arial,sans-serif; }
+    footer { margin-top: 2.5rem; font-size: 1rem; color: #666; text-align:center; font-family:'Open Sans',Arial,sans-serif; }
+  </style>
+</head>
+<body>
+<main>
+  <div style="text-align:center;margin-bottom:2rem;">
+    <img src="logo.png" alt="Klium logo" style="max-width:340px;width:100%;height:auto;display:block;margin:0 auto 0.5rem auto;">
+    <div style="font-family:'Open Sans',Arial,sans-serif;font-size:1.25rem;font-weight:600;color:#6B818C;letter-spacing:.04em;">MAKE THE DIFFERENCE</div>
+  </div>
+
+  <h1><i class="fas fa-star"></i> New Brands Overview</h1>
+  <p class="meta">
+    This overview shows brands for which the first live/visible product was published in the selected period (2025).
+
+  <div class="actions">
+    <a id="csv" class="button outline" href="./data.csv" download>Download CSV</a>
+  </div>
+
+  <section>
+    <table id="tbl" class="display" style="width:100%"></table>
+    <div id="totals"></div>
+  </section>
+
+  <footer>
+    <div><i class="fas fa-clock"></i> Generated on <span id="gen"></span></div>
+    <div><i class="fas fa-database"></i> Source: PrestaShop ps_product / ps_product_shop / ps_manufacturer (only active/visible products).</div>
+    <div style="margin-top:.5rem;">&copy; 2025 Klium | Powered by GitHub Pages</div>
+  </footer>
+</main>
+
+<script>
+fetch('./data.json', { cache: 'no-cache' })
+  .then(res => res.json())
+  .then(payload => {
+    const items = payload.items || [];
+    document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
+    document.getElementById('totals').textContent =
+      `Total active/visible products: ${payload.meta.sum_producten} | Number of brands: ${payload.meta.rows}`;
+
+    // Build a fallback HTML table if DataTable doesn't work
+    const tbl = document.getElementById('tbl');
+  let html = '<thead><tr><th>Brand</th><th>First product live</th><th>Number of products</th><th>Active/Visible products</th></tr></thead><tbody>';
+    for (const r of items) {
+  html += `<tr><td>${r.merk}</td><td>${r.eerste_product_live}</td><td>${r.aantal_producten}</td><td>${r.aantal_actief ?? ''}</td></tr>`;
+    }
+    html += '</tbody>';
+    tbl.innerHTML = html;
+
+    // Try to initialize DataTable
+    try {
+      new DataTable('#tbl', {
+        pageLength: 25,
+        order: [[1, 'desc']],
+        layout: { topStart: null, topEnd: null, bottomStart: 'search', bottomEnd: 'paging' }
+      });
+    } catch (e) {
+      // Fallback: regular table remains
+    }
+  })
+  .catch(() => {
+    document.getElementById('tbl').outerHTML = '<p style="color:red">Could not load data.json.</p>';
+  });
+</script>
+</body>
+</html>
