@@ -13,7 +13,23 @@
     .meta { font-size: .95rem; color: #555; }
     .actions { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; }
     .pill { padding: .25rem .5rem; border: 1px solid #ddd; border-radius: 999px; }
-    table { width: 100%; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f5f7fa;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background: #f9fbfd;
+    }
     footer { margin-top: 2rem; font-size: .9rem; color: #666; }
   </style>
 </head>

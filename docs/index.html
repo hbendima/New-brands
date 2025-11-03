@@ -25,7 +25,11 @@
     tr:hover td { background: #FBB13C; }
     th:nth-child(1), td:nth-child(1) { min-width: 170px; }
     th:nth-child(2), td:nth-child(2) { min-width: 190px; }
-    th:nth-child(3), td:nth-child(3) { min-width: 130px; text-align: right; }
+    th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) {
+      min-width: 130px;
+      width: 130px;
+      text-align: right;
+    }
     #totals { margin-top:1.2rem; font-weight:600; font-size:1.15rem; color:#DF1C51; font-family:'Open Sans',Arial,sans-serif; }
     footer { margin-top: 2.5rem; font-size: 1rem; color: #666; text-align:center; font-family:'Open Sans',Arial,sans-serif; }
   </style>
@@ -63,8 +67,14 @@ fetch('./data.json', { cache: 'no-cache' })
   .then(payload => {
     const items = payload.items || [];
     document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
+    let totalProducts = 0;
+    let totalActive = 0;
+    for (const r of items) {
+      totalProducts += r.aantal_producten;
+      totalActive += r.aantal_actief;
+    }
     document.getElementById('totals').textContent =
-      `Total active/visible products: ${payload.meta.sum_producten} | Number of brands: ${payload.meta.rows}`;
+      `Total products: ${totalProducts} | total active/visible products: ${totalActive} | Number of brands: ${items.length}`;
 
     // Build a fallback HTML table if DataTable doesn't work
     const tbl = document.getElementById('tbl');
