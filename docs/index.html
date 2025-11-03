@@ -64,13 +64,13 @@ fetch('./data.json', { cache: 'no-cache' })
     const items = payload.items || [];
     document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
     document.getElementById('totals').textContent =
-      `Total products with new brands: ${payload.meta.sum_producten} | Number of brands: ${payload.meta.rows}`;
+      `Total active/visible products: ${payload.meta.sum_producten} | Number of brands: ${payload.meta.rows}`;
 
     // Build a fallback HTML table if DataTable doesn't work
     const tbl = document.getElementById('tbl');
-    let html = '<thead><tr><th>Brand</th><th>First product live</th><th>Number of products</th></tr></thead><tbody>';
+  let html = '<thead><tr><th>Brand</th><th>First product live</th><th>Number of products</th><th>Active/Visible products</th></tr></thead><tbody>';
     for (const r of items) {
-      html += `<tr><td>${r.merk}</td><td>${r.eerste_product_live}</td><td>${r.aantal_producten}</td></tr>`;
+  html += `<tr><td>${r.merk}</td><td>${r.eerste_product_live}</td><td>${r.aantal_producten}</td><td>${r.aantal_actief ?? ''}</td></tr>`;
     }
     html += '</tbody>';
     tbl.innerHTML = html;
