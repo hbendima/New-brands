@@ -157,7 +157,8 @@ def main():
     }
 
     write_json(out_dir / "data.json", payload)
-    write_csv(out_dir / "data.csv", items)
+    # Schrijf CSV altijd naar docs/data.csv
+    write_csv(pathlib.Path(ROOT.parent / "docs" / "data.csv"), items)
 
     # Minimale index als je die nog niet hebt
     index_path = out_dir / "index.html"
