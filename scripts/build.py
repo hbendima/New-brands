@@ -6,7 +6,8 @@ ROOT = pathlib.Path(__file__).resolve().parent
 
 def load_env():
     # Eenvoudige .env loader (geen extra dependency)
-    env_path = ROOT / '.env'
+    # Altijd .env uit de hoofdmap van het project laden
+    env_path = pathlib.Path(__file__).resolve().parent.parent / '.env'
     if not env_path.exists():
         return
     for line in env_path.read_text(encoding='utf-8').splitlines():
@@ -42,46 +43,54 @@ def connect():
     return mysql.connector.connect(**cfg)
 
 def fetch_new_brands(conn, shop_id, start_date, end_date, min_products):
-    # MySQL 5.7+ compatible (geen CTE). Alleen actieve/zichtbare producten in gekozen shop.
-    sql = """
+        # Nieuwe logica: geen filtering op shop-id, active of visibility, extra kolommen
+        sql = """
+    WITH eerste_product_per_merk AS (
+        SELECT
+            pp.id_manufacturer,
+            MIN(pp.date_add) AS eerste_product_launch
+        FROM
+            ps_product pp
+        GROUP BY pp.id_manufacturer
+    ),
+    nieuwe_merken AS (
+        SELECT
+            pm.id_manufacturer,
+            pm.name AS merk,
+            epm.eerste_product_launch
+        FROM
+            eerste_product_per_merk epm
+        JOIN ps_manufacturer pm ON pm.id_manufacturer = epm.id_manufacturer
+        WHERE epm.eerste_product_launch >= %s
+          AND epm.eerste_product_launch <  %s
+    ),
+    producten_nieuwe_merken AS (
+        SELECT
+            pp.id_product,
+            pp.id_manufacturer,
+            pp.active,
+            pp.visibility
+        FROM
+            ps_product pp
+        WHERE pp.id_manufacturer IN (SELECT id_manufacturer FROM nieuwe_merken)
+    )
     SELECT
-      pm.id_manufacturer,
-      pm.name AS merknaam,
-      lp.first_live_product_at,
-      (
-        SELECT COUNT(DISTINCT p2.id_product)
-        FROM ps_product p2
-        JOIN ps_product_shop s2
-          ON s2.id_product = p2.id_product
-         AND s2.id_shop = %s
-         AND s2.active = 1
-         AND s2.visibility <> 'none'
-        WHERE p2.id_manufacturer = pm.id_manufacturer
-      ) AS product_count
-    FROM (
-      SELECT
-        p.id_manufacturer,
-        MIN(p.date_add) AS first_live_product_at
-      FROM ps_product p
-      JOIN ps_product_shop s
-        ON s.id_product = p.id_product
-       AND s.id_shop = %s
-       AND s.active = 1
-       AND s.visibility <> 'none'
-      GROUP BY p.id_manufacturer
-    ) lp
-    JOIN ps_manufacturer pm ON pm.id_manufacturer = lp.id_manufacturer
-    WHERE lp.first_live_product_at >= %s
-      AND lp.first_live_product_at <  %s
-    HAVING product_count >= %s
-    ORDER BY lp.first_live_product_at DESC
-    """
-    params = (shop_id, shop_id, start_date, end_date, min_products)
-    cur = conn.cursor(dictionary=True)
-    cur.execute(sql, params)
-    rows = cur.fetchall()
-    cur.close()
-    return rows
+        nm.merk,
+        nm.eerste_product_launch,
+        COUNT(DISTINCT pnm.id_product) AS aantal_producten,
+        SUM(CASE WHEN pnm.active = 1 AND pnm.visibility = 'both' THEN 1 ELSE 0 END) AS aantal_actief
+    FROM nieuwe_merken nm
+    JOIN producten_nieuwe_merken pnm ON nm.id_manufacturer = pnm.id_manufacturer
+    GROUP BY nm.id_manufacturer, nm.merk, nm.eerste_product_launch
+    HAVING COUNT(DISTINCT pnm.id_product) >= %s
+    ORDER BY nm.eerste_product_launch DESC
+        """
+        params = (start_date, end_date, min_products)
+        cur = conn.cursor(dictionary=True)
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+        cur.close()
+        return rows
 
 def write_json(path, payload):
     with open(path, "w", encoding="utf-8") as f:
@@ -90,9 +99,9 @@ def write_json(path, payload):
 def write_csv(path, items):
     with open(path, "w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["merk", "eerste_product_live", "aantal_producten"])
+        w.writerow(["brand", "first_product_live", "total_products", "active_products"])
         for r in items:
-            w.writerow([r["merk"], r["eerste_product_live"], r["aantal_producten"]])
+            w.writerow([r["brand"], r["first_product_live"], r["total_products"], r["active_products"]])
 
 def main():
     load_env()
@@ -118,13 +127,20 @@ def main():
     finally:
         conn.close()
 
-    items, total_products = [], 0
+    items, total_products, total_active = [], 0, 0
     for r in rows:
         first_ts = r["eerste_product_launch"]
         iso = first_ts.isoformat(sep=" ") if hasattr(first_ts, "isoformat") else str(first_ts)
         count = int(r["aantal_producten"] or 0)
-        items.append({"merk": r["merk"], "eerste_product_live": iso, "aantal_producten": count})
+        count_active = int(r["aantal_actief"] or 0)
+        items.append({
+            "brand": r["merk"],
+            "first_product_live": iso,
+            "total_products": count,
+            "active_products": count_active
+        })
         total_products += count
+        total_active += count_active
 
     payload = {
         "meta": {
@@ -134,7 +150,8 @@ def main():
             "min_products": args.min_products,
             "generated_at": dt.datetime.utcnow().isoformat(timespec="seconds") + "Z",
             "rows": len(items),
-            "sum_producten": total_products,
+            "sum_products": total_products,
+            "sum_active": total_active,
         },
         "items": items,
     }
