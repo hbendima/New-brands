@@ -70,17 +70,17 @@ fetch('./data.json', { cache: 'no-cache' })
     let totalProducts = 0;
     let totalActive = 0;
     for (const r of items) {
-      totalProducts += r.aantal_producten;
-      totalActive += r.aantal_actief;
+      totalProducts += r.total_products;
+      totalActive += r.active_products;
     }
     document.getElementById('totals').textContent =
       `Total products: ${totalProducts} | total active/visible products: ${totalActive} | Number of brands: ${items.length}`;
 
     // Build a fallback HTML table if DataTable doesn't work
     const tbl = document.getElementById('tbl');
-  let html = '<thead><tr><th>Brand</th><th>First product live</th><th>Number of products</th><th>Active/Visible products</th></tr></thead><tbody>';
+    let html = '<thead><tr><th>Brand</th><th>First product live</th><th>Number of products</th><th>Active/Visible products</th></tr></thead><tbody>';
     for (const r of items) {
-  html += `<tr><td>${r.merk}</td><td>${r.eerste_product_live}</td><td>${r.aantal_producten}</td><td>${r.aantal_actief ?? ''}</td></tr>`;
+      html += `<tr><td>${r.brand}</td><td>${r.first_product_live}</td><td>${r.total_products}</td><td>${r.active_products ?? ''}</td></tr>`;
     }
     html += '</tbody>';
     tbl.innerHTML = html;
