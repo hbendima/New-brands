@@ -118,7 +118,8 @@ def main():
     start_date = args.since or f"{today.year}-01-01"
     end_date = args.until or f"{today.year+1}-01-01"
 
-    out_dir = pathlib.Path(args.out_dir)
+    # Forceer output naar hoofdmap docs/
+    out_dir = pathlib.Path(ROOT.parent / "docs")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     conn = connect()
@@ -157,8 +158,7 @@ def main():
     }
 
     write_json(out_dir / "data.json", payload)
-    # Schrijf CSV altijd naar docs/data.csv
-    write_csv(pathlib.Path(ROOT.parent / "docs" / "data.csv"), items)
+    write_csv(out_dir / "data.csv", items)
 
     # Minimale index als je die nog niet hebt
     index_path = out_dir / "index.html"
