@@ -31,4 +31,4 @@ Zet GitHub Pages aan op de `docs/` folder (Settings → Pages → Deploy from a 
 - Min. producten: `--min-products`.
 
 ## Opmerking
-De query telt alleen actieve en zichtbare producten in de gekozen shop (`ps_product_shop.active=1` en `visibility!='none'`).
+De query telt alle producten van een merk. Het aantal actieve en zichtbare producten wordt als aparte kolom weergegeven in de output.

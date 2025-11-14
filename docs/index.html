@@ -66,7 +66,9 @@ fetch('./data.json', { cache: 'no-cache' })
   .then(res => res.json())
   .then(payload => {
     const items = payload.items || [];
-    document.getElementById('gen').textContent   = new Date(payload.meta.generated_at).toLocaleString();
+    const genDate = new Date(payload.meta.generated_at);
+    const genStr = genDate.toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ', ' + genDate.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('gen').textContent = genStr;
     let totalProducts = 0;
     let totalActive = 0;
     for (const r of items) {
