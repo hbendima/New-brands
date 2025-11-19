@@ -4,12 +4,18 @@
     "start_date": "2025-01-01",
     "end_date": "2026-01-01",
     "min_products": 0,
-    "generated_at": "2025-11-14T08:02:14Z",
-    "rows": 17,
-    "sum_products": 3140,
-    "sum_active": 3082
+    "generated_at": "2025-11-19T08:42:18Z",
+    "rows": 18,
+    "sum_products": 3146,
+    "sum_active": 3088
   },
   "items": [
+    {
+      "brand": "KLIUM",
+      "first_product_live": "2025-11-18 09:32:44",
+      "total_products": 6,
+      "active_products": 6
+    },
     {
       "brand": "GENERMORE",
       "first_product_live": "2025-10-16 07:07:43",
