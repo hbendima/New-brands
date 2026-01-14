@@ -11,7 +11,7 @@ Genereer een statische pagina met nieuwe merken uit PrestaShop en host via GitHu
 
 2) Data genereren (lokaal)
 ```bash
-python scripts/build.py --since 2025-01-01 --until 2026-01-01 --shop-id 4 --min-products 0
+python scripts/build.py --since 2025-10-01 --until 2027-01-01 --shop-id 4 --min-products 0
 ```
 Dit schrijft `docs/data.json` en `docs/data.csv`.
 
