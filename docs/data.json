@@ -4,17 +4,17 @@
     "start_date": "2025-10-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-01-14T11:58:41Z",
+    "generated_at": "2026-01-26T10:39:11Z",
     "rows": 4,
-    "sum_products": 35,
-    "sum_active": 35
+    "sum_products": 39,
+    "sum_active": 39
   },
   "items": [
     {
       "brand": "BENNING",
       "first_product_live": "2026-01-13 15:13:30",
-      "total_products": 7,
-      "active_products": 7
+      "total_products": 11,
+      "active_products": 11
     },
     {
       "brand": "KLIUM",
