@@ -4,17 +4,17 @@
     "start_date": "2025-10-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-03-11T14:20:08Z",
+    "generated_at": "2026-04-03T11:04:52Z",
     "rows": 5,
-    "sum_products": 40,
-    "sum_active": 40
+    "sum_products": 42,
+    "sum_active": 42
   },
   "items": [
     {
       "brand": "TOPCON",
       "first_product_live": "2026-03-11 15:13:23",
-      "total_products": 1,
-      "active_products": 1
+      "total_products": 3,
+      "active_products": 3
     },
     {
       "brand": "BENNING",
