@@ -4,12 +4,18 @@
     "start_date": "2025-10-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-04-03T11:04:52Z",
-    "rows": 5,
-    "sum_products": 42,
-    "sum_active": 42
+    "generated_at": "2026-04-10T07:16:45Z",
+    "rows": 6,
+    "sum_products": 51,
+    "sum_active": 51
   },
   "items": [
+    {
+      "brand": "PRIMACOVER",
+      "first_product_live": "2026-04-09 13:53:28",
+      "total_products": 9,
+      "active_products": 9
+    },
     {
       "brand": "TOPCON",
       "first_product_live": "2026-03-11 15:13:23",
