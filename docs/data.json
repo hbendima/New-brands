@@ -4,12 +4,18 @@
     "start_date": "2025-10-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-04-10T07:16:45Z",
-    "rows": 6,
-    "sum_products": 51,
-    "sum_active": 51
+    "generated_at": "2026-04-27T12:39:08Z",
+    "rows": 7,
+    "sum_products": 994,
+    "sum_active": 993
   },
   "items": [
+    {
+      "brand": "SPAX",
+      "first_product_live": "2026-04-23 11:48:11",
+      "total_products": 899,
+      "active_products": 898
+    },
     {
       "brand": "PRIMACOVER",
       "first_product_live": "2026-04-09 13:53:28",
@@ -43,8 +49,8 @@
     {
       "brand": "STIHL",
       "first_product_live": "2025-10-07 08:52:56",
-      "total_products": 12,
-      "active_products": 12
+      "total_products": 56,
+      "active_products": 56
     }
   ]
 }
