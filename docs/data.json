@@ -4,10 +4,10 @@
     "start_date": "2025-10-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-05-11T12:53:51Z",
+    "generated_at": "2026-05-27T08:48:20Z",
     "rows": 7,
     "sum_products": 994,
-    "sum_active": 993
+    "sum_active": 992
   },
   "items": [
     {
@@ -50,7 +50,7 @@
       "brand": "STIHL",
       "first_product_live": "2025-10-07 08:52:56",
       "total_products": 56,
-      "active_products": 56
+      "active_products": 55
     }
   ]
 }
