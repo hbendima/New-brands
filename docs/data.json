@@ -1,20 +1,20 @@
 {
   "meta": {
     "shop_id": 4,
-    "start_date": "2025-10-01",
+    "start_date": "2026-01-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-05-27T08:48:20Z",
-    "rows": 7,
-    "sum_products": 994,
-    "sum_active": 992
+    "generated_at": "2026-06-24T14:22:14Z",
+    "rows": 4,
+    "sum_products": 922,
+    "sum_active": 922
   },
   "items": [
     {
       "brand": "SPAX",
       "first_product_live": "2026-04-23 11:48:11",
       "total_products": 899,
-      "active_products": 898
+      "active_products": 899
     },
     {
       "brand": "PRIMACOVER",
@@ -33,24 +33,6 @@
       "first_product_live": "2026-01-13 15:13:30",
       "total_products": 11,
       "active_products": 11
-    },
-    {
-      "brand": "KLIUM",
-      "first_product_live": "2025-12-16 13:55:41",
-      "total_products": 6,
-      "active_products": 6
-    },
-    {
-      "brand": "GENERMORE",
-      "first_product_live": "2025-10-16 07:07:43",
-      "total_products": 10,
-      "active_products": 10
-    },
-    {
-      "brand": "STIHL",
-      "first_product_live": "2025-10-07 08:52:56",
-      "total_products": 56,
-      "active_products": 55
     }
   ]
 }
