@@ -1,13 +1,13 @@
 {
   "meta": {
     "shop_id": 4,
-    "start_date": "2025-10-01",
+    "start_date": "2026-01-01",
     "end_date": "2027-01-01",
     "min_products": 0,
-    "generated_at": "2026-07-27T07:48:39Z",
-    "rows": 9,
-    "sum_products": 1005,
-    "sum_active": 1005
+    "generated_at": "2026-07-27T07:50:15Z",
+    "rows": 6,
+    "sum_products": 932,
+    "sum_active": 932
   },
   "items": [
     {
@@ -45,24 +45,6 @@
       "first_product_live": "2026-01-13 15:13:30",
       "total_products": 11,
       "active_products": 11
-    },
-    {
-      "brand": "KLIUM",
-      "first_product_live": "2025-12-16 13:55:41",
-      "total_products": 6,
-      "active_products": 6
-    },
-    {
-      "brand": "GENERMORE",
-      "first_product_live": "2025-10-16 07:07:43",
-      "total_products": 10,
-      "active_products": 10
-    },
-    {
-      "brand": "STIHL",
-      "first_product_live": "2025-10-07 08:52:56",
-      "total_products": 57,
-      "active_products": 57
     }
   ]
 }
